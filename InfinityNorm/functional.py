@@ -1,4 +1,5 @@
 from torch import nn
+import torch
 
 
 def infnorm(m: nn.Module, always_norm=True, name="weight") -> nn.Module:

@@ -13,7 +13,7 @@ class SigmaNet(nn.Module):
     ):
         super().__init__()
         self.nn = nn
-        self.bound = sigma
+        self.register_buffer("sigma", torch.Tensor([sigma])
         if monotonic_in is not None:
             assert (
                     nfeatures is not None
@@ -26,6 +26,6 @@ class SigmaNet(nn.Module):
             self.mask = torch.tensor([1]).float()
 
     def forward(self, x):
-        return self.bound * (
+        return self.sigma * (
                 self.nn(x) + (x * self.mask.to(x.device)).sum(axis=-1, keepdim=True)
         )
