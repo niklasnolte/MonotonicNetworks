@@ -1,10 +1,14 @@
 from torch import nn
 
 
-def infnorm(m: nn.Module, name='weight') -> nn.Module:
+def infnorm(m: nn.Module, always_norm=True, name="weight") -> nn.Module:
     def absi(m: nn.Module, _) -> None:
-        weight = getattr(m, name + '_orig')
-        weight = weight / weight.abs().sum(axis=0)
+        weight = getattr(m, name + "_orig")
+        norms = weight.abs().sum(axis=0)
+        if always_norm:
+            weight = weight / norms
+        else:
+            weight = weight / torch.max(torch.ones_like(norms), norms)
         setattr(m, name, weight)
 
     w = m._parameters[name]
