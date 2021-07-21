@@ -2,10 +2,12 @@ from torch import nn
 import torch
 
 
-def infnorm(m: nn.Module, always_norm=True, name="weight") -> nn.Module:
+def infnorm(m: nn.Module, always_norm=True, alpha=None, name="weight") -> nn.Module:
     def absi(m: nn.Module, _) -> None:
         weight = getattr(m, name + "_orig")
         norms = weight.abs().sum(axis=0)
+        if alpha is not None:
+            norms = alpha * norms
         if always_norm:
             weight = weight / norms
         else:
