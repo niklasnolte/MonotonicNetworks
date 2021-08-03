@@ -61,7 +61,7 @@ def _get_normed_weights(weight, kind, always_norm, alpha, vectorwise):
 
     alpha = alpha or 1
 
-    if always_norm:
+    if not always_norm:
         norms = torch.max(torch.ones_like(norms), norms / alpha)
 
     if kind == "inf" and vectorwise:
