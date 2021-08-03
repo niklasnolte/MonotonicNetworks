@@ -63,6 +63,8 @@ def _get_normed_weights(weight, kind, always_norm, alpha, vectorwise):
 
     if not always_norm:
         norms = torch.max(torch.ones_like(norms), norms / alpha)
+    else:
+        norms = norms / alpha
 
     if kind == "inf" and vectorwise:
         # if the sum was over axis 1, the shape is different
