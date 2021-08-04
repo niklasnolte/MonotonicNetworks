@@ -4,7 +4,7 @@ import torch
 kinds = ["one", "inf", "one-inf"]
 
 
-def divide_norm(
+def direct_norm(
     m: nn.Module,
     kind="one",
     always_norm=True,
