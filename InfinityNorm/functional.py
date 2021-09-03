@@ -17,7 +17,7 @@ def direct_norm(
 
     def normalize_weight(m: nn.Module, _) -> None:
         weight = getattr(m, name + "_orig")
-        weight = _get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
+        weight = get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
         setattr(m, name, weight)
 
     w = m._parameters[name]
@@ -42,14 +42,14 @@ def project_norm(
     @torch.no_grad()
     def normalize_weight(m: nn.Module, _) -> None:
         weight = getattr(m, name).detach()
-        weight = _get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
+        weight = get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
         getattr(m, name).copy_(weight)
 
     m.register_forward_pre_hook(normalize_weight)
     return m
 
 
-def _get_normed_weights(weight, kind, always_norm, alpha, vectorwise):
+def get_normed_weights(weight, kind, always_norm, alpha, vectorwise):
     if kind == "one":
         norms = weight.abs().sum(axis=0)
     elif kind == "inf":
