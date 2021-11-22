@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='InfinityNorm',
+    name='monotonenorm',
     version='0.1.0',
-    packages=['InfinityNorm'],
+    packages=['monotonenorm'],
     url='',
     license='MIT',
     author='Ouail Kitouni, Niklas Nolte',
