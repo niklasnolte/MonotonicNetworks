@@ -1,16 +1,21 @@
 from torch import nn
 import torch
+import typing as t
 
-kinds = ["one", "inf", "one-inf"]
+kinds = [
+    "one",  # |W|_1 constraint
+    "inf",  # |W|_inf constraint
+    "one-inf",  # |W|_1,inf constraint
+]
 
 
 def direct_norm(
     m: nn.Module,
-    kind="one",
-    always_norm=True,
-    alpha=None,
-    name="weight",
-    vectorwise=True,
+    kind: str = "one",
+    always_norm: bool = True,
+    alpha: t.Optional[float] = None,
+    name: str = "weight",
+    vectorwise: bool = True,
 ) -> nn.Module:
     if kind not in kinds:
         raise ValueError(f"kind {kind} not recognized. Choose one of {kinds}")
@@ -30,11 +35,11 @@ def direct_norm(
 
 def project_norm(
     m: nn.Module,
-    kind="one",
-    always_norm=True,
-    alpha=None,
-    name="weight",
-    vectorwise=True,
+    kind: str = "one",
+    always_norm: bool = True,
+    alpha: t.Optional[float] = None,
+    name: str = "weight",
+    vectorwise: bool = True,
 ) -> nn.Module:
     if kind not in kinds:
         raise ValueError(f"kind {kind} not recognized. Choose one of {kinds}")
@@ -49,7 +54,13 @@ def project_norm(
     return m
 
 
-def get_normed_weights(weight, kind, always_norm, alpha, vectorwise):
+def get_normed_weights(
+    weight: torch.Tensor,
+    kind: str,
+    always_norm: bool,
+    alpha: t.Optional[float],
+    vectorwise: bool,
+) -> torch.Tensor:
     if kind == "one":
         norms = weight.abs().sum(axis=0)
     elif kind == "inf":
