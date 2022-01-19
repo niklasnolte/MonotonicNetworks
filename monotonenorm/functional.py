@@ -13,7 +13,7 @@ kinds = [
 def direct_norm(
     m: nn.Module,
     kind: str = "one",
-    always_norm: bool = True,
+    always_norm: bool = False,
     alpha: t.Optional[float] = None,
     name: str = "weight",
     vectorwise: bool = True,
