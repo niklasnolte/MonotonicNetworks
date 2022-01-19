@@ -26,6 +26,10 @@ def train(norm):
         GroupSort(2),
         norm(torch.nn.Linear(32, 1), kind="inf", always_norm=False),
     )
+    # define training target
+    # fit f(x) = x^2 / 2
+    x = torch.linspace(-1, 1, 100).view(-1, 1)
+    y = x**2 / 2
 
     optim = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -39,10 +43,5 @@ def train(norm):
 
 if __name__ == '__main__':
     torch.manual_seed(0)
-    # define training target
-    # fit f(x) = x^2 / 2
-    x = torch.linspace(-1, 1, 100).view(-1, 1)
-    y = x**2 / 2
-
     # run the tests
     unittest.main()
