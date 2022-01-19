@@ -49,7 +49,7 @@ def project_norm(
     def normalize_weight(m: nn.Module, _) -> None:
         weight = getattr(m, name).detach()
         weight = get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
-        getattr(m, name).copy_(weight)
+        getattr(m, name).data.copy_(weight)
 
     m.register_forward_pre_hook(normalize_weight)
     return m
