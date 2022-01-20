@@ -65,11 +65,11 @@ def get_normed_weights(
     if kind == "one":
         norms = weight.abs().sum(axis=0)
     elif kind == "inf":
-        norms = weight.abs().sum(axis=1)
+        norms = weight.abs().sum(axis=1, keepdim=True)
     elif kind == "one-inf":
         norms = weight.abs().amax(dim=0)
     elif kind == "two-inf":
-        norms = torch.norm(weight, p=2, dim=1)
+        norms = torch.norm(weight, p=2, dim=1, keepdim=True)
     if not vectorwise:
         norms = norms.max()
 
@@ -80,10 +80,6 @@ def get_normed_weights(
     else:
         norms = norms / alpha
 
-    if (kind == "inf" or kind == "two-inf") and vectorwise:
-        # if the sum was over axis 1, the shape is different
-        weight = (weight.T / norms).T
-    else:
-        weight = weight / norms
+    weight = weight / norms
 
     return weight
