@@ -1,0 +1,46 @@
+lines.color: white
+patch.edgecolor: white
+
+text.usetex : False
+text.color: white
+font.serif: Computer Modern Roman #Bitstream Vera Serif
+font.family: sans-serif
+
+axes.facecolor: black #light gray eeeeee
+axes.edgecolor: white
+axes.labelcolor: white
+axes.prop_cycle: cycler('color', ['royalblue', '228833','cc3311', 'ee7733',  '009988', 'ccbb44', 'bb5566', '332288', '66ccee', '4477aa'])
+axes.labelsize:     large  # fontsize of the x any y labels
+axes.titlesize      : x-large   ## fontsize of the axes title
+
+axes.grid:          False   # display grid or not
+axes.grid.axis:     both    # which axis the grid should apply to
+axes.grid.which:    major   # gridlines at {major, minor, both} ticks
+grid.color:     b0b0b0  # grid color
+grid.linestyle: --       # solid
+grid.linewidth: 0.4     # in points
+grid.alpha:     0.2     # transparency, between 0.0 and 1.0
+
+legend.framealpha : 0.5
+legend.fontsize : large
+legend.frameon       : False     ## if True, draw the legend on a background patch
+
+xtick.color: white
+xtick.labelsize:     large  # fontsize of the tick labels
+xtick.top            : True  ## draw ticks on the top side
+xtick.direction      : in    ## direction: in, out, or inout
+ytick.color: white
+ytick.labelsize:     large  # fontsize of the tick labels
+ytick.right            : True  ## draw ticks on the top side
+ytick.direction      : in    ## direction: in, out, or inout
+
+figure.facecolor: black
+#figure.frameon : False         ## enable figure frame
+figure.edgecolor: black
+figure.titlesize: xx-large
+
+savefig.facecolor: black
+savefig.edgecolor: black
+savefig.format      : pdf      ## png, ps, pdf, svg
+savefig.transparent : False    ## setting that controls whether figures are saved with a
+
