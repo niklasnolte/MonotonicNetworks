@@ -31,6 +31,8 @@ def get_sorting_shape(x: torch.Tensor, n_groups: int, axis: int = -1) -> list:
 
 
 def group_sort(x: torch.Tensor, n_groups: int, axis: int = -1) -> torch.Tensor:
+    if x.shape[0] == 0:
+        return x
     size = get_sorting_shape(x, n_groups, axis)
     grouped_x = x.view(*size)
     sort_dim = axis if axis == -1 else axis + 1
