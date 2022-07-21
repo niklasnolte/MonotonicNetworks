@@ -19,14 +19,18 @@ class SigmaNet(torch.nn.Module):
                 which takes a vector of size 3 is meant to be monotonic in the last
                 feature only, then monotone_constraints should be [0, 0, 1].
                 Defaults to all features (i.e. a vector of ones everywhere).
+                Montonically deacreasing features should have value -1 instead of 1.
+            sigma (float, optional): Lipschitz constant of the network given in nn. Defaults to 1.
                 """
         super().__init__()
         self.nn = nn
         self.register_buffer("sigma", torch.Tensor([sigma]))
-        self.monotone_constraint = monotone_constraints or [1]
-        self.monotone_constraint = torch.tensor(self.monotone_constraint).float()
+        monotone_constraints = monotone_constraints or [1]
+        self.register_buffer(
+            "monotone_constraints", torch.tensor(monotone_constraints).float()
+        )
 
     def forward(self, x: torch.Tensor):
-        return self.nn(x) + self.sigma * (
-            x * self.monotone_constraint.to(x.device)
-        ).sum(axis=-1, keepdim=True)
+        return self.nn(x) + self.sigma * (x * self.monotone_constraints).sum(
+            axis=-1, keepdim=True
+        )

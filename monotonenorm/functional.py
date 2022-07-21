@@ -11,57 +11,149 @@ kinds = [
 
 
 def direct_norm(
-    m: nn.Module,
+    layer: nn.Linear,
     kind: str = "one",
     always_norm: bool = False,
-    alpha: t.Optional[float] = None,
-    name: str = "weight",
+    max_norm: float = None,
+    parameter_name: str = "weight",
     vectorwise: bool = True,
-) -> nn.Module:
+) -> nn.Linear:
+    """
+    Constrain the norm of a layer's weight matrix. This function is meant to be
+    used as a wrapper around `torch.nn.Linear`. It adds a hook to the forward pass 
+    to constrain the norm of the weight matrix. The hook is registered as a forward pre-hook.
+    This means that the weights are normalized before the forward pass and that the gradients
+    are backpropagated through normalization back to the original weights.
+
+
+    Args:
+        layer (nn.Linear): The layer to constrain.
+        kind (str, optional): The kind of norm to constrain options are
+             [
+                "one",  # |W|_1 constraint
+                "inf",  # |W|_inf constraint
+                "one-inf",  # |W|_1,inf constraint
+                "two-inf",  # |W|_2,inf constraint
+            ]
+            Defaults to "one".
+        always_norm (bool, optional): Always normalize the weights to max_norm or allow them 
+            to have a norm smaller than 1. Defaults to False.
+        max_norm (float, optional): The maximum norm to constrain the weights to. Defaults to 1. 
+        parameter_name (str, optional): Name of the weight matrix in the layer. Defaults to "weight".
+        vectorwise (bool, optional): Normalize the matrix vectors instead of the matrix itself. 
+            The vector norm is a weaker constraint and gives better results. See the paper for details.
+            Defaults to True.
+    Raises:
+        ValueError: If kind is not one of the options.
+
+    Returns:
+        nn.Linear: The layer with the hook registered. Matrix multiplication will be done with 
+            normalized version of the weights.
+    """
     if kind not in kinds:
         raise ValueError(f"kind {kind} not recognized. Choose one of {kinds}")
 
-    def normalize_weight(m: nn.Module, _) -> None:
-        weight = getattr(m, name + "_orig")
-        weight = get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
-        setattr(m, name, weight)
+    def normalize_weight(layer: nn.Linear, _) -> None:
+        """Pre-hook function to normalize the weights. 
 
-    w = m._parameters[name]
-    delattr(m, name)
-    m.register_parameter(name + "_orig", w)
-    setattr(m, name, w.data)
-    m.register_forward_pre_hook(normalize_weight)
-    return m
+        Args:
+            m (nn.Linear): The layer to normalize.
+            _ : Unused.
+        """
+        weight = getattr(layer, parameter_name + "_orig")  # get the original weights
+        weight = get_normed_weights(weight, kind, always_norm, max_norm, vectorwise)
+        # normalize the weights from the original weights
+        setattr(layer, parameter_name, weight)
+        # use the normalizeed weights when the layer is called
+
+    w = layer._parameters[parameter_name]  # get the weights
+    delattr(
+        layer, parameter_name
+    )  # delete the weights from the layer to avoid "double graph traversal"
+    layer.register_parameter(parameter_name + "_orig", w)  # store original weights
+    setattr(layer, parameter_name, w.data)
+    layer.register_forward_pre_hook(normalize_weight)
+    return layer
 
 
 def project_norm(
-    m: nn.Module,
+    layer: nn.Linear,
     kind: str = "one",
     always_norm: bool = True,
-    alpha: t.Optional[float] = None,
-    name: str = "weight",
+    max_norm: t.Optional[float] = None,
+    parameter_name: str = "weight",
     vectorwise: bool = True,
-) -> nn.Module:
+) -> nn.Linear:
+    """
+    Constrain the norm of a layer's weight matrix by projecting the weight matrix to the correct norm.
+    This function is meant to be used as a wrapper around `torch.nn.Linear`. It adds a hook to the forward pass
+    which projects to the current weight matrix to a normalized matrix but the gradients are not backpropagated 
+    through normalization. 
+
+    Args:
+        layer (nn.Linear): The layer to constrain.
+        kind (str, optional): The kind of norm to constrain options are
+             [
+                "one",  # |W|_1 constraint
+                "inf",  # |W|_inf constraint
+                "one-inf",  # |W|_1,inf constraint
+                "two-inf",  # |W|_2,inf constraint
+            ]
+            Defaults to "one".
+        always_norm (bool, optional): Always normalize the weights to max_norm or allow them 
+            to have a norm smaller than 1. Defaults to False.
+        max_norm (float, optional): The maximum norm to constrain the weights to. Defaults to 1. 
+        parameter_name (str, optional): Name of the weight matrix in the layer. Defaults to "weight".
+        vectorwise (bool, optional): Normalize the matrix vectors instead of the matrix itself. 
+            The vector norm is a weaker constraint and gives better results. See the paper for details.
+            Defaults to True.
+    Raises:
+        ValueError: If kind is not one of the options.
+
+    Returns:
+        nn.Linear: The layer with the hook registered. Matrix multiplication will be done with 
+            normalized version of the weights.
+    """
     if kind not in kinds:
         raise ValueError(f"kind {kind} not recognized. Choose one of {kinds}")
 
     @torch.no_grad()
-    def normalize_weight(m: nn.Module, _) -> None:
-        weight = getattr(m, name).detach()
-        weight = get_normed_weights(weight, kind, always_norm, alpha, vectorwise)
-        getattr(m, name).data.copy_(weight)
+    def normalize_weight(layer: nn.Linear, _) -> None:
+        weight = getattr(layer, parameter_name).detach()
+        weight = get_normed_weights(weight, kind, always_norm, max_norm, vectorwise)
+        getattr(layer, parameter_name).data.copy_(weight)
 
-    m.register_forward_pre_hook(normalize_weight)
-    return m
+    layer.register_forward_pre_hook(normalize_weight)
+    return layer
 
 
 def get_normed_weights(
     weight: torch.Tensor,
     kind: str,
     always_norm: bool,
-    alpha: t.Optional[float],
+    max_norm: t.Optional[float],
     vectorwise: bool,
 ) -> torch.Tensor:
+    """
+    Normalize weight matrix to a given norm.
+
+    Args:
+        weight (torch.Tensor): The weight matrix to normalize.
+        kind (str): The kind of norm to constrain options are
+                [
+                    "one",  # |W|_1 constraint
+                    "inf",  # |W|_inf constraint
+                    "one-inf",  # |W|_1,inf constraint
+                    "two-inf",  # |W|_2,inf constraint
+                ]
+        always_norm (bool): Always normalize the weights to max_norm or allow them
+            to have a norm smaller than 1.
+        max_norm (t.Optional[float]): The maximum norm to constrain the weights to.
+        vectorwise (bool): Normalize the matrix vectors instead of the matrix itself.
+
+    Returns:
+        torch.Tensor: The normalized weight matrix.
+    """
     if kind == "one":
         norms = weight.abs().sum(axis=0)
     elif kind == "inf":
@@ -73,12 +165,12 @@ def get_normed_weights(
     if not vectorwise:
         norms = norms.max()
 
-    alpha = alpha or 1
+    max_norm = max_norm or 1
 
     if not always_norm:
-        norms = torch.max(torch.ones_like(norms), norms / alpha)
+        norms = torch.max(torch.ones_like(norms), norms / max_norm)
     else:
-        norms = norms / alpha
+        norms = norms / max_norm
 
     weight = weight / norms
 
