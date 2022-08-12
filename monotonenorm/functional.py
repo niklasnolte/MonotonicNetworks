@@ -1,5 +1,6 @@
 from torch import nn
 import torch
+from torch.nn.utils.parametrize import register_parametrization
 import typing as t
 
 kinds = [
@@ -53,26 +54,12 @@ def direct_norm(
     if kind not in kinds:
         raise ValueError(f"kind {kind} not recognized. Choose one of {kinds}")
 
-    def normalize_weight(layer: nn.Linear, _) -> None:
-        """Pre-hook function to normalize the weights. 
+    class Normalize(nn.Module):
+      def forward(self, W):
+        return get_normed_weights(W, kind, always_norm, max_norm, vectorwise)
 
-        Args:
-            m (nn.Linear): The layer to normalize.
-            _ : Unused.
-        """
-        weight = getattr(layer, parameter_name + "_orig")  # get the original weights
-        weight = get_normed_weights(weight, kind, always_norm, max_norm, vectorwise)
-        # normalize the weights from the original weights
-        setattr(layer, parameter_name, weight)
-        # use the normalizeed weights when the layer is called
+    register_parametrization(layer, parameter_name, Normalize())
 
-    w = layer._parameters[parameter_name]  # get the weights
-    delattr(
-        layer, parameter_name
-    )  # delete the weights from the layer to avoid "double graph traversal"
-    layer.register_parameter(parameter_name + "_orig", w)  # store original weights
-    setattr(layer, parameter_name, w.data)
-    layer.register_forward_pre_hook(normalize_weight)
     return layer
 
 
