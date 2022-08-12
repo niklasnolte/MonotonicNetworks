@@ -29,7 +29,7 @@ def get_model(monotonic):
       return direct_norm(
           module,  # the layer to constrain
           "one",  # |W|_1 constraint type
-          alpha=LIP ** (1 / 3),  # norm of the layer (LIP ** (1/nlayers))
+          max_norm=LIP ** (1 / 3),  # norm of the layer (LIP ** (1/nlayers))
       )
 
   model = torch.nn.Sequential(
