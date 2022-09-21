@@ -25,7 +25,8 @@ class SigmaNet(torch.nn.Module):
         super().__init__()
         self.nn = nn
         self.register_buffer("sigma", torch.Tensor([sigma]))
-        monotone_constraints = monotone_constraints or [1]
+        if monotone_constraints is None:
+          monotone_constraints = [1]
         self.register_buffer(
             "monotone_constraints", torch.tensor(monotone_constraints).float()
         )

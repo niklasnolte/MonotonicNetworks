@@ -146,7 +146,7 @@ def get_normed_weights(
     elif kind == "inf":
         norms = weight.abs().sum(axis=1, keepdim=True)
     elif kind == "one-inf":
-        norms = weight.abs().amax(dim=0)
+        norms = weight.abs()
     elif kind == "two-inf":
         norms = torch.norm(weight, p=2, dim=1, keepdim=True)
     if not vectorwise:
@@ -159,6 +159,6 @@ def get_normed_weights(
     else:
         norms = norms / max_norm
 
-    weight = weight / norms
+    weight = weight / torch.max(norms, torch.ones_like(norms)*1e-10)
 
     return weight
