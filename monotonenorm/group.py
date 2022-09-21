@@ -11,7 +11,15 @@ class GroupSort(torch.nn.Module):
         return group_sort(x, self.n_groups, self.axis)
 
     def extra_repr(self):
-        return f"num_groups: {self.n_groups}"
+        return f"Number of groups: {self.n_groups}"
+
+class LazyGroupSort(GroupSort):
+    def __init__(self, axis: int = -1):
+        super(LazyGroupSort, self).__init__(-1, axis)
+
+    def forward(self, x: torch.Tensor):
+        n_groups = x.shape[self.axis] // 2
+        return group_sort(x, n_groups, self.axis)
 
 
 def get_sorting_shape(x: torch.Tensor, n_groups: int, axis: int = -1) -> list:

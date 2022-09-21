@@ -6,7 +6,7 @@ class SigmaNet(torch.nn.Module):
     def __init__(
         self,
         nn: torch.nn.Module,  # Must already be sigma lipschitz
-        sigma: float,
+        sigma: float = 1.0,
         monotone_constraints: T.Optional[T.Iterable] = None,
     ):
         """ Implementation of a monotone network with a sigma lipschitz constraint.
