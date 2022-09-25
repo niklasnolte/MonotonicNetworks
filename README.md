@@ -14,6 +14,18 @@ The function direct_norm can also apply various weight constraints on torch.nn.L
 "two-inf",  # |W|_2,inf constraint
 ~~~
 
+# Installation
+<div align="center">
+
+| <center> **pip** | <center> **conda**|
+|---|---|
+|`pip install monotonenorm`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonenorm.svg)](https://badge.fury.io/py/monotonenorm)</center>| `conda install -c okitouni monotonenorm`<br> <center>[![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonenorm)](https://anaconda.org/okitouni/monotonenorm)</center> |
+
+</div>
+
+
+</div>
+
 # Examples
 Checkout the `Examples` directory for more details:
 
