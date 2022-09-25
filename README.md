@@ -30,8 +30,9 @@ The function direct_norm can also apply various weight constraints on torch.nn.L
 Checkout the `Examples` directory for more details:
 
 ## Monotonicity
-We will make a simple toy regression model to fit the following 1D function f(x) = log(x) + \epsilon(x)
-where \epsilon(x) is a gaussian noise term whose variance is linearly increasing in x. 
+We will make a simple toy regression model to fit the following 1D function 
+$$f(x) = log(x) + \epsilon(x)$$
+where $\epsilon(x)$ is a gaussian noise term whose variance is linearly increasing in x. 
 In this toy model we will assume that we have good reason to believe that the function we are trying to fit is monotonic (despite non-monotnic behavior of the noise). For example, we are building a trigger algorithm to discriminate between signal and background events. Rarer events are more likely to be signal and thus we should employ a network which is monotonic in some "rareness" feature. Another example could be a hiring classifier where (all else equal) higher school grades should imply better chances of being hired. 
 
 Training a monotonic NN and an unconstrained NN on the purple points and evaluating the networks on a uniform grid gives the following result:
