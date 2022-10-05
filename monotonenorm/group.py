@@ -19,7 +19,7 @@ def get_sorting_shape(x: torch.Tensor, n_groups: int, axis: int = -1) -> list:
     num_features = shape[axis]
     if num_features % n_groups:
         raise ValueError(
-            "number of features({num_features}) needs to be a multiple of n_groups({n_groups})"
+            f"number of features({num_features}) needs to be a multiple of n_groups({n_groups})"
         )
     shape[axis] = -1
     n_per_group = num_features // n_groups
