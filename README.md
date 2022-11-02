@@ -1,4 +1,4 @@
-# MonotOneNorm
+# MonotoneNorm
 
 Implementation of Lipschitz Monotonic networks, implemented via weight constraints in the 1-Norm:  
 
