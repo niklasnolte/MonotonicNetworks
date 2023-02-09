@@ -18,6 +18,7 @@ def direct_norm(
     max_norm: float = None,
     parameter_name: str = "weight",
     vectorwise: bool = True,
+    orthogonal: bool = False,
 ) -> nn.Linear:
     """
     Constrain the norm of a layer's weight matrix. This function is meant to be
@@ -44,6 +45,7 @@ def direct_norm(
         vectorwise (bool, optional): Normalize the matrix vectors instead of the matrix itself. 
             The vector norm is a weaker constraint and gives better results. See the paper for details.
             Defaults to True.
+        orthogonal (bool, optional): If True, the weight matrix is initialized to be orthogonal. Defaults to False.
     Raises:
         ValueError: If kind is not one of the options.
 
@@ -53,7 +55,8 @@ def direct_norm(
     """
     if kind not in kinds:
         raise ValueError(f"kind {kind} not recognized. Choose one of {kinds}")
-
+    if orthogonal:
+        nn.init.orthogonal_(getattr(layer, parameter_name))
     class Normalize(nn.Module):
       def forward(self, W):
         return get_normed_weights(W, kind, always_norm, max_norm, vectorwise)
@@ -137,6 +140,7 @@ def get_normed_weights(
             to have a norm smaller than 1.
         max_norm (t.Optional[float]): The maximum norm to constrain the weights to.
         vectorwise (bool): Normalize the matrix vectors instead of the matrix itself.
+            The vector norm is a weaker constraint and gives better results. See the paper for details.
 
     Returns:
         torch.Tensor: The normalized weight matrix.
