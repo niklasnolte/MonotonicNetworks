@@ -1,7 +1,5 @@
 # MonotoneNorm
 
-Install via `pip install monotonenorm`.
-
 Implementation of Lipschitz Monotonic networks, implemented via weight constraints in the 1-Norm:  
 
 <img src="https://render.githubusercontent.com/render/math?math=\prod_i||W^i||_1 \leq \lambda">
