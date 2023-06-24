@@ -1,18 +1,15 @@
-# MonotoneNorm
+# Lipschitz Monotonic Networks
 
-Implementation of Lipschitz Monotonic networks, implemented via weight constraints in the 1-Norm:  
+Implementation of Lipschitz Monotonic Networks, from the ICLR 2023 Submission: https://openreview.net/pdf?id=w2P7fMy_RH
 
-<img src="https://render.githubusercontent.com/render/math?math=\prod_i||W^i||_1 \leq \lambda">
-
-NeurIPS ML4PS workshop extended abstract: https://arxiv.org/abs/2112.00038
-
-The function direct_norm can also apply various weight constraints on torch.nn.Linear layers through the `kind` keyword. Here are the available weight norms: 
+The function `direct_norm` can apply various weight constraints on torch.nn.Linear layers through the `kind` keyword. Here are the available weight norms: 
 ~~~ 
-"one",  # |W|_1 constraint
-"inf",  # |W|_inf constraint
+"one",      # |W|_1 constraint
+"inf",      # |W|_inf constraint
 "one-inf",  # |W|_1,inf constraint
 "two-inf",  # |W|_2,inf constraint
 ~~~
+
 
 # Installation
 <div align="center">
