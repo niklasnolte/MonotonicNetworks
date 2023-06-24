@@ -87,3 +87,22 @@ class MonotonicLayer(LipschitzLayer):
             x.unsqueeze(-1) * self.monotone_constraints
         ).sum(axis=1)
         return (super().forward(x) + residual) / 2
+
+
+class RMSNorm(torch.nn.Module):
+    def __init__(self, norm_shape):
+        super().__init__()
+        self.register_buffer("norm_shape", torch.tensor(norm_shape))
+        self.register_parameter(
+            "weight",
+            torch.nn.Parameter(
+                torch.ones(norm_shape) / self.norm_shape.sqrt()
+            ),
+        )
+        self.register_parameter(
+            "bias", torch.nn.Parameter(torch.zeros(norm_shape))
+        )
+
+    def forward(self, x):
+        rms = torch.sqrt(torch.mean(x**2, axis=-1, keepdim=True)).clip(min=1)
+        return (x / rms) * self.weight + self.bias
