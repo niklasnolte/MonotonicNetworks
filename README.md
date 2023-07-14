@@ -46,4 +46,4 @@ GroupSort weight constrained Neural Networks are universal approximators of Lips
 
 Here are the contour lines of the resulting networks (along with the training points in white).
 
-![Flower](Examples/flower_bs16.png)
+![Flower](Examples/flower.jpg)
