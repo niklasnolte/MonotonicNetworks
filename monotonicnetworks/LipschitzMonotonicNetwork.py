@@ -60,18 +60,19 @@ class LipschitzLinear(Linear):
     """
 
     def __init__(
-        self, in_features, out_features, bias=True, lipschitz_const=1, kind="one-inf"
+        self,
+        in_features,
+        out_features,
+        bias=True,
+        lipschitz_const=1,
+        kind="one-inf",
     ):
         super().__init__(in_features, out_features, bias=bias)
         self.register_buffer(
             "lipschitz_const", torch.Tensor([lipschitz_const])
         )
         # Directly enforce Lipschitz constraint
-        self = direct_norm(
-            self,
-            max_norm=lipschitz_const,
-            kind=kind
-        )
+        self = direct_norm(self, max_norm=lipschitz_const, kind=kind)
 
     def forward(self, x):
         return torch.nn.functional.linear(x, self.weight, self.bias)
@@ -110,7 +111,9 @@ class MonotonicLayer(LipschitzLinear):
         monotone_constraints: T.Optional[T.Iterable] = None,
         kind="one-inf",
     ):
-        super().__init__(in_features, out_features, bias, lipschitz_const, kind)
+        super().__init__(
+            in_features, out_features, bias, lipschitz_const, kind
+        )
         self.register_buffer(
             "lipschitz_const", torch.tensor([lipschitz_const])
         )
@@ -152,7 +155,8 @@ class RMSNorm(Module):
 
     def forward(self, x):
         rms = torch.sqrt(torch.mean(x**2, dim=-1, keepdim=True)).clip(min=1)
-        return (x / rms) * self.weight + self.bias
+        weight = self.weight.pow(2)  # type: ignore
+        return (x / rms) * weight + self.bias
 
 
 class SigmaNet(MonotonicWrapper):
