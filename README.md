@@ -1,6 +1,7 @@
 # Table of Contents
 - [Lipschitz Monotonic Networks](#lipschitz-monotonic-networks)
 - [Installation](#installation)
+- [Requirements](#requirements)
 - [Usage](#usage) 
 - [Examples](#examples)
     - [Monotonicity](#monotonicity)
@@ -24,12 +25,24 @@ The code here allows one to apply various weight constraints on torch.nn.Linear 
 
 | <center> **pip** | <center> **conda**|
 |---|---|
-|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c okitouni monotonicnetworks`<br> <center>[![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonicnetworks)](https://anaconda.org/okitouni/monotonicnetworks)</center> |
+|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c conda-forge monotonicnetworks`<br> <center>[![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonicnetworks)](https://anaconda.org/okitouni/monotonicnetworks)</center> |
 
 </div>
 
 
 </div>
+
+Note that the package used to be called `monotonenorm` and was renamed to `monotonicnetworks` on 2023-07-15. The old package is still available on PyPI and conda-forge, but will not be updated.
+
+ [![PyPI version](https://badge.fury.io/py/monotonenorm.svg)](https://badge.fury.io/py/monotonenorm) (deprecated) `pip install monotonenorm`
+
+[![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonenorm)](https://anaconda.org/okitouni/monotonenorm) (deprecated) `conda install -c okitouni monotonenorm` 
+
+# Requirements
+Make sure you have the following packages installed:
+- torch (required)
+- matplotlib (optional, for plotting examples)
+- tqdm (optional, to run the examples with a progress bar)
 
 # Usage
 Here's an example showing two ways to create a Lipschitz constrained linear layer.

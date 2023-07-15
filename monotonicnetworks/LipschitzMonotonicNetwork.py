@@ -179,8 +179,10 @@ class SigmaNet(MonotonicWrapper):
                 Montonically deacreasing features should have value -1 instead of 1.
             sigma (float, optional): Lipschitz constant of the network given in nn. Defaults to 1.
         """
-        warnings.warn(
-            "SigmaNet is deprecated, use MonotonicWrapper instead",
-            DeprecationWarning,
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter('default', DeprecationWarning)
+            warnings.warn(
+                "SigmaNet is deprecated, use MonotonicWrapper instead",
+                DeprecationWarning,
+            )
         super().__init__(nn, sigma, monotone_constraints)
