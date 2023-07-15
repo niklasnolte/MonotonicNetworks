@@ -7,9 +7,9 @@ from monotonenorm import GroupSort, direct_norm
 from argparse import ArgumentParser
 from pathlib import Path
 
-torch.manual_seed(0)
-# plt.style.use("mpl-config")
+plt.style.use(Path(__file__).parent / "mpl-config")
 
+torch.manual_seed(0)
 parser = ArgumentParser()
 parser.add_argument(
     "--train",
@@ -157,7 +157,7 @@ plt.clabel(cs, inline=True, fontsize=10, fmt="%.2f")
 plt.scatter(
     *x_train[::2].T, c="black", s=20, alpha=1, marker="x", zorder=11  # type: ignore
 )  # overlay the training data
-fig_name = "flower.jpg"
+fig_name = "flower.png"
 plt.tight_layout(pad=0)
 
 file_path = Path.joinpath(path_root, "figures/")

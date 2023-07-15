@@ -42,5 +42,5 @@ figure.titlesize: xx-large
 savefig.facecolor: white
 savefig.edgecolor: white
 savefig.format      : pdf      ## png, ps, pdf, svg
-savefig.transparent : False    ## setting that controls whether figures are saved with a
+savefig.transparent : True    ## setting that controls whether figures are saved with a
 
