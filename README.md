@@ -59,11 +59,11 @@ The `MonotonicWrapper` class is a wrapper around a module with a Lipschitz const
 The `SigmaNet` class is a deprecated class that is equivalent to the MonotonicWrapper class.
 
 The `RMSNorm` class is a class that implements the RMSNorm normalization layer. It can help when training 
-a model with many Lipschitz constrained layers.
+a model with many Lipschitz-constrained layers.
 
 
 # Examples
-Checkout the `Examples` directory for more details. Specifically, `Examples/flower.py` shows how to train a Lipschitz Monotonic Network to regress on a complex decision boundary in 2D (under [Lipschitz NNs can describe arbitrarily complex boundaries](#lipschitz-nns-can-describe-arbitrarily-complex-boundaries)), and `Examples/Examples.ipynb` for the code used to make the plots under [Monotonicity](#monotonicity) and [Robustness](#robustness).
+Checkout the `Examples` directory for more details. Specifically, `Examples/flower.py` shows how to train a Lipschitz Monotonic Network to regress on a complex decision boundary in 2D (under [Lipschitz NNs can describe arbitrarily complex boundaries](#lipschitz-nns-can-describe-arbitrarily-complex-boundaries)), and `Examples/Examples_paper.ipynb` for the code used to make the plots under [Monotonicity](#monotonicity) and [Robustness](#robustness).
 
 ## Monotonicity
 We will make a simple toy regression model to fit the following 1D function 
