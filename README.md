@@ -24,7 +24,7 @@ The code here allows one to apply various weight constraints on torch.nn.Linear 
 
 | <center> **pip** | <center> **conda**|
 |---|---|
-|`pip install monotonenorm`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonenorm.svg)](https://badge.fury.io/py/monotonenorm)</center>| `conda install -c okitouni monotonenorm`<br> <center>[![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonenorm)](https://anaconda.org/okitouni/monotonenorm)</center> |
+|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c okitouni monotonicnetworks`<br> <center>[![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonicnetworks)](https://anaconda.org/okitouni/monotonicnetworks)</center> |
 
 </div>
 
@@ -35,7 +35,7 @@ The code here allows one to apply various weight constraints on torch.nn.Linear 
 Here's an example showing two ways to create a Lipschitz constrained linear layer.
 ```python
 from torch import nn
-import monotonenorm as lmn
+import monotonicnetworks as lmn
 
 linear_by_norming = lmn.direct_norm(nn.Linear(10, 10), kind="one-inf") # |W|_1,inf constraint
 linear_native = lmn.LipschitzLinear(10, 10, kind="one-inf") # |W|_1,inf constraint
@@ -47,7 +47,7 @@ The `LipschitzLinear` class is a linear layer with a Lipschitz constraint on its
 
 The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer where the first output is monotonically increasing in the first input ([1, 0]), the second output is monotonically decreasing in the second input ([0, -1]), and the third output is monotonically increasing in the first input and monotonically decreasing in the second input ([1, -1]). We can do this by specifying the monotonicity constraints as follows:
 ```python
-import monotonenorme as lmn
+import monotonicnetworkse as lmn
 
 linear = lmn.MonotonicLayer(2, 3, monotone_constraints=[[1, 0], [0, 1], [1, -1]])
 ```

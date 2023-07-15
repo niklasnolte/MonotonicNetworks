@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import torch
 from tqdm import tqdm
 from torch.utils.data import DataLoader, TensorDataset
-from monotonenorm import GroupSort, direct_norm
+from monotonicnetworks import GroupSort, direct_norm
 from argparse import ArgumentParser
 from pathlib import Path
 
