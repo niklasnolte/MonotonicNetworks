@@ -23,7 +23,7 @@ grid.alpha:     0.2     # transparency, between 0.0 and 1.0
 
 legend.framealpha : 0.5
 legend.fontsize : large
-legend.frameon       : False     ## if True, draw the legend on a background patch
+legend.frameon       : True     ## if True, draw the legend on a background patch
 
 xtick.color: black
 xtick.labelsize:     large  # fontsize of the tick labels
