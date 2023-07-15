@@ -1,6 +1,8 @@
 # Bug fix for project_norm
 import unittest
-from monotonenorm import GroupSort, project_norm, direct_norm
+from .functional import direct_norm, project_norm
+from .group import GroupSort
+from .LipschitzMonotonicNetwork import LipschitzLinear
 import torch
 
 
@@ -34,14 +36,20 @@ def train(norm):
     optim = torch.optim.Adam(model.parameters(), lr=0.001)
 
     for i in range(2000):
-        loss = torch.mean((model(x) - y)**2)
+        loss = torch.mean((model(x) - y) ** 2)
         loss.backward()
         optim.step()
         optim.zero_grad()
-    return loss.item()
+    return loss.item()  # type: ignore
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     torch.manual_seed(0)
     # run the tests
     unittest.main()
+
+    linear = LipschitzLinear(1, 2)
+    x = torch.linspace(-1, 1, 5).view(-1, 1)
+    y = linear(x)
+    print("x", x)
+    print("linear(x)", y)

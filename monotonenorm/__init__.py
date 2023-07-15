@@ -2,8 +2,9 @@ from .functional import direct_norm, project_norm, get_normed_weights
 from .LipschitzMonotonicNetwork import (
     MonotonicWrapper,
     MonotonicLayer,
-    LipschitzLayer,
+    LipschitzLinear,
     RMSNorm,
+    SigmaNet
 )
 from .group import GroupSort
 
@@ -15,5 +16,6 @@ __all__ = [
     "get_normed_weights",
     "MonotonicLayer",
     "RMSNorm",
-    "LipschitzLayer",
+    "LipschitzLinear",
+    "SigmaNet",
 ]
