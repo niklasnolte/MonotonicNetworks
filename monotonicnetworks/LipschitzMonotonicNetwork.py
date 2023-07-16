@@ -36,7 +36,9 @@ class MonotonicWrapper(Module):
         """
         super().__init__()
         self.nn = lipschitz_module
-        self.register_buffer("lipschitz_const", torch.Tensor([lipschitz_const]))
+        self.register_buffer(
+            "lipschitz_const", torch.Tensor([lipschitz_const])
+        )
         if monotonic_constraints is None:
             monotonic_constraints = [1]
         monotonic_constraints = torch.Tensor(monotonic_constraints)
@@ -61,8 +63,13 @@ class LipschitzLinear(Linear):
             Default: ``True``
         lipschitz_const (float, optional): Lipschitz constant of the layer.
             Default: ``1``
-        kind (str, optional): Type of Lipschitz constraint to enforce.
-            Will be passed to :func:`direct_norm`, see its documentation for details.
+        kind (str, optional): Type of Lipschitz constraint to enforce. Options are
+            - "one",  # |W|_1 constraint
+            - "inf",  # |W|_inf constraint
+            - "one-inf",  # |W|_1,inf constraint
+            - "two-inf",  # |W|_2,inf constraint
+            Will be passed to :func:`direct_norm`, see its documentation for more details.
+            Defaults to "one".
     """
 
     def __init__(
@@ -74,7 +81,9 @@ class LipschitzLinear(Linear):
         kind: str = "one-inf",
     ):
         super().__init__(in_features, out_features, bias=bias)
-        self.register_buffer("lipschitz_const", torch.Tensor([lipschitz_const]))
+        self.register_buffer(
+            "lipschitz_const", torch.Tensor([lipschitz_const])
+        )
         # Directly enforce Lipschitz constraint
         self = direct_norm(self, max_norm=lipschitz_const, kind=kind)
 
@@ -101,7 +110,12 @@ class MonotonicLayer(LipschitzLinear):
             with respect to the i-th input.
             Default: ``None``
         kind (str, optional): Type of Lipschitz constraint to enforce. Default: ``"one-inf"``
-            Will be passed to :func:`direct_norm`, see its documentation for details.
+            Options are
+            - "one",  # |W|_1 constraint
+            - "inf",  # |W|_inf constraint
+            - "one-inf",  # |W|_1,inf constraint
+            - "two-inf",  # |W|_2,inf constraint
+            Will be passed to :func:`direct_norm`, see its documentation for more details.
     """
 
     def __init__(
@@ -113,8 +127,12 @@ class MonotonicLayer(LipschitzLinear):
         monotonic_constraints: T.Optional[T.Iterable] = None,
         kind: str = "one-inf",
     ):
-        super().__init__(in_features, out_features, bias, lipschitz_const, kind)
-        self.register_buffer("lipschitz_const", torch.tensor([lipschitz_const]))
+        super().__init__(
+            in_features, out_features, bias, lipschitz_const, kind
+        )
+        self.register_buffer(
+            "lipschitz_const", torch.tensor([lipschitz_const])
+        )
         if monotonic_constraints is None:
             monotonic_constraints = torch.ones(in_features)
         else:
@@ -137,22 +155,24 @@ class MonotonicLayer(LipschitzLinear):
 
     def forward(self, x: torch.Tensor):
         residual = self.lipschitz_const * x @ self.monotonic_constraints
-        x = super()(x)
+        x = torch.nn.functional.linear(x, self.weight, self.bias)
         return (x + residual) / 2
 
 
 class RMSNorm(Module):
-    def __init__(self, norm_shape: T.Union[T.Iterable, int], affine: bool = True):
+    def __init__(
+        self, norm_shape: T.Union[T.Iterable, int], affine: bool = True
+    ):
         super().__init__()
         self.register_buffer("norm_shape", torch.tensor(norm_shape))
         weights = torch.ones(norm_shape) / self.norm_shape.sqrt()  # type: ignore
         self.register_parameter("weight", Parameter(weights, affine))
-        bias = torch.zeros(norm_shape)
+        bias = torch.zeros(norm_shape)  # type: ignore
         self.register_parameter("bias", Parameter(bias, affine))
 
     def forward(self, x):
         rms = torch.sqrt(torch.mean(x**2, dim=-1, keepdim=True)).clip(min=1)
-        return (x / rms) * self.weight.pow(2) + self.bias
+        return (x / rms) * self.weight.pow(2) + self.bias  # type: ignore
 
 
 class SigmaNet(MonotonicWrapper):
