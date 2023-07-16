@@ -10,11 +10,11 @@ class MonotonicWrapper(Module):
         self,
         lipschitz_module: Module,  # Must already be lipschitz
         lipschitz_const: float = 1,
-        monotone_constraints: T.Optional[T.Iterable] = None,
+        monotonic_constraints: T.Optional[T.Iterable] = None,
     ):
         """This is a wrapper around a module with a lipschitz_const lipschitz constant. It
             adds a term to the output of the module which enforces monotonicity constraints
-            given by monotone_constraints.
+            given by monotonic_constraints.
             Returns a module which is monotonic and Lipschitz with constant lipschitz_const.
 
         Args:
@@ -22,26 +22,33 @@ class MonotonicWrapper(Module):
                 constant lipschitz_const.
             lipschitz_const (float, optional): Lipschitz constant of the network given in nn.
                 Defaults to 1.
-            monotone_constraints (T.Optional[T.Iterable], optional): Iterable of the
-                monotonic features. For example, if a network
-                which takes a vector of size 3 is meant to be monotonic in the last
-                feature only, then monotone_constraints should be [0, 0, 1].
-                Defaults to all features (i.e. a vector of ones everywhere).
-                Montonically deacreasing features should have value -1 instead of 1.
+            monotonic_constraints (torch.Tensor, optional): Monotonicity constraints on the inputs.
+                If None, all inputs are assumed to be monotonically increasing.
+                If monotonic_constraints[i] = 1, the i-th input is constrained to be non-decreasing.
+                If monotonic_constraints[i] = -1, the i-th input is constrained to be
+                non-increasing.
+                If monotonic_constraints[i] = 0, the i-th input is unconstrained.
+
+                If a 1D tensor, the same constraint is applied to all ouputs.
+                If a 2D tensor, the (i, j)-th element specifies the constraint on the j-th output
+                with respect to the i-th input.
+                Default: ``None``
         """
         super().__init__()
         self.nn = lipschitz_module
         self.register_buffer(
             "lipschitz_const", torch.Tensor([lipschitz_const])
         )
-        if monotone_constraints is None:
-            monotone_constraints = [1]
-        monotone_constraints = torch.Tensor(monotone_constraints)
-        self.register_buffer("monotone_constraints", monotone_constraints)
+        if monotonic_constraints is None:
+            monotonic_constraints = [1]
+        monotonic_constraints = torch.Tensor(monotonic_constraints)
+        if monotonic_constraints.ndim == 1:
+            monotonic_constraints = monotonic_constraints.unsqueeze(-1)
+        self.register_buffer("monotonic_constraints", monotonic_constraints)
 
     def forward(self, x: torch.Tensor):
-        tiled_input = (x * self.monotone_constraints).sum(dim=-1, keepdim=True)
-        residual = self.lipschitz_const * tiled_input
+        mc = self.monotonic_constraints.expand(x.shape[1], -1)  # type: ignore
+        residual = self.lipschitz_const * x @ mc
         return self.nn(x) + residual
 
 
@@ -89,11 +96,11 @@ class MonotonicLayer(LipschitzLinear):
             Default: ``True``
         lipschitz_const (float, optional): Lipschitz constant of the layer.
             Default: ``1``
-        monotone_constraints (torch.Tensor, optional): Monotonicity constraints on the inputs.
+        monotonic_constraints (torch.Tensor, optional): Monotonicity constraints on the inputs.
             If None, all inputs are assumed to be monotonically increasing.
-            If monotone_constraints[i] = 1, the i-th input is constrained to be non-decreasing.
-            If monotone_constraints[i] = -1, the i-th input is constrained to be non-increasing.
-            If monotone_constraints[i] = 0, the i-th input is unconstrained.
+            If monotonic_constraints[i] = 1, the i-th input is constrained to be non-decreasing.
+            If monotonic_constraints[i] = -1, the i-th input is constrained to be non-increasing.
+            If monotonic_constraints[i] = 0, the i-th input is unconstrained.
 
             If a 1D tensor, the same constraint is applied to all ouputs.
             If a 2D tensor, the (i, j)-th element specifies the constraint on the j-th output
@@ -108,7 +115,7 @@ class MonotonicLayer(LipschitzLinear):
         out_features,
         bias=True,
         lipschitz_const=1,
-        monotone_constraints: T.Optional[T.Iterable] = None,
+        monotonic_constraints: T.Optional[T.Iterable] = None,
         kind="one-inf",
     ):
         super().__init__(
@@ -117,29 +124,31 @@ class MonotonicLayer(LipschitzLinear):
         self.register_buffer(
             "lipschitz_const", torch.tensor([lipschitz_const])
         )
-        if monotone_constraints is None:
-            monotone_constraints = [1] * in_features
-        monotone_constraints = torch.tensor(monotone_constraints)
-        if monotone_constraints.ndim == 1:
-            monotone_constraints = monotone_constraints.repeat(
-                out_features, 1
-            ).T
-        if monotone_constraints.shape[0] != in_features:
+        if monotonic_constraints is None:
+            monotonic_constraints = torch.ones(in_features)
+        else:
+            monotonic_constraints = torch.Tensor(
+                monotonic_constraints)
+        if monotonic_constraints.ndim == 1:
+            monotonic_constraints = monotonic_constraints.unsqueeze(-1)
+        if monotonic_constraints.shape[0] != in_features:
             raise ValueError(
-                f"monotone_constraints must be of length {in_features},"
-                f" got {monotone_constraints.shape[0]}"
+                f"monotonic_constraints must be of length {in_features},"
+                f" got {monotonic_constraints.shape[0]}"
             )
-        if monotone_constraints.shape[1] != out_features:
+        if (
+            monotonic_constraints.shape[1] != out_features
+            and monotonic_constraints.shape[1] != 1
+        ):
             raise ValueError(
-                "monotone_constraints must be of shape (in_features, out_features),"
-                f" got {monotone_constraints.shape}"
+                "monotonic_constraints must be of shape (in_features, out_features),"
+                f" got {monotonic_constraints.shape}"
             )
 
-        self.register_buffer("monotone_constraints", monotone_constraints)
+        self.register_buffer("monotonic_constraints", monotonic_constraints)
 
     def forward(self, x: torch.Tensor):
-        tiled_input = x.unsqueeze(-1) * self.monotone_constraints
-        residual = self.lipschitz_const * tiled_input.sum(dim=-2)
+        residual = self.lipschitz_const * x @ self.monotonic_constraints
         x = torch.nn.functional.linear(x, self.weight, self.bias)
         return (x + residual) / 2
 
@@ -164,25 +173,25 @@ class SigmaNet(MonotonicWrapper):
         self,
         nn: Module,  # Must already be sigma lipschitz
         sigma: float,
-        monotone_constraints: T.Optional[T.Iterable] = None,
+        monotonic_constraints: T.Optional[T.Iterable] = None,
     ):
         """Implementation of a monotone network with a sigma lipschitz constraint.
 
         Args:
             nn (torch.nn.Module): Lipschitz-constrained network with Lipschitz
                 constant sigma.
-            monotone_constraints (T.Optional[T.Iterable], optional): Iterable of the
+            monotonic_constraints (T.Optional[T.Iterable], optional): Iterable of the
                 monotonic features. For example, if a network
                 which takes a vector of size 3 is meant to be monotonic in the last
-                feature only, then monotone_constraints should be [0, 0, 1].
+                feature only, then monotonic_constraints should be [0, 0, 1].
                 Defaults to all features (i.e. a vector of ones everywhere).
                 Montonically deacreasing features should have value -1 instead of 1.
             sigma (float, optional): Lipschitz constant of the network given in nn. Defaults to 1.
         """
         with warnings.catch_warnings():
-            warnings.simplefilter('default', DeprecationWarning)
+            warnings.simplefilter("default", DeprecationWarning)
             warnings.warn(
                 "SigmaNet is deprecated, use MonotonicWrapper instead",
                 DeprecationWarning,
             )
-        super().__init__(nn, sigma, monotone_constraints)
+        super().__init__(nn, sigma, monotonic_constraints)

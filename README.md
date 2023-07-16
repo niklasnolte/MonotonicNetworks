@@ -62,12 +62,12 @@ The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its 
 ```python
 import monotonicnetworkse as lmn
 
-linear = lmn.MonotonicLayer(2, 3, monotone_constraints=[[1, 0], [0, 1], [1, -1]])
+linear = lmn.MonotonicLayer(2, 3, monotonic_constraints=[[1, 0], [0, 1], [1, -1]])
 ```
 Using a 1D tensor for the constraint assumes that they are the same for each output dimension. By default, the code assumes all outputs are monotonically increasing with all inputs.
 
 
-The `MonotonicWrapper` class is a wrapper around a module with a Lipschitz constant. It adds a term to the output of the module which enforces monotonicity constraints given by monotone_constraints. The class returns a module which is monotonic and Lipschitz with constant lipschitz_const.
+The `MonotonicWrapper` class is a wrapper around a module with a Lipschitz constant. It adds a term to the output of the module which enforces monotonicity constraints given by monotonic_constraints. The class returns a module which is monotonic and Lipschitz with constant lipschitz_const.
 
 The `SigmaNet` class is a deprecated class that is equivalent to the MonotonicWrapper class.
 
