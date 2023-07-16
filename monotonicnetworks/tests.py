@@ -47,9 +47,3 @@ if __name__ == "__main__":
     torch.manual_seed(0)
     # run the tests
     unittest.main()
-
-    linear = LipschitzLinear(1, 2)
-    x = torch.linspace(-1, 1, 5).view(-1, 1)
-    y = linear(x)
-    print("x", x)
-    print("linear(x)", y)

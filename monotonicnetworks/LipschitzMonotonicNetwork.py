@@ -9,7 +9,7 @@ class MonotonicWrapper(Module):
     def __init__(
         self,
         lipschitz_module: Module,  # Must already be lipschitz
-        lipschitz_const: float = 1,
+        lipschitz_const: float = 1.0,
         monotonic_constraints: T.Optional[T.Iterable] = None,
     ):
         """This is a wrapper around a module with a lipschitz_const lipschitz constant. It
@@ -36,9 +36,7 @@ class MonotonicWrapper(Module):
         """
         super().__init__()
         self.nn = lipschitz_module
-        self.register_buffer(
-            "lipschitz_const", torch.Tensor([lipschitz_const])
-        )
+        self.register_buffer("lipschitz_const", torch.Tensor([lipschitz_const]))
         if monotonic_constraints is None:
             monotonic_constraints = [1]
         monotonic_constraints = torch.Tensor(monotonic_constraints)
@@ -64,25 +62,21 @@ class LipschitzLinear(Linear):
         lipschitz_const (float, optional): Lipschitz constant of the layer.
             Default: ``1``
         kind (str, optional): Type of Lipschitz constraint to enforce.
+            Will be passed to :func:`direct_norm`, see its documentation for details.
     """
 
     def __init__(
         self,
-        in_features,
-        out_features,
-        bias=True,
-        lipschitz_const=1,
-        kind="one-inf",
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+        lipschitz_const: float = 1.0,
+        kind: str = "one-inf",
     ):
         super().__init__(in_features, out_features, bias=bias)
-        self.register_buffer(
-            "lipschitz_const", torch.Tensor([lipschitz_const])
-        )
+        self.register_buffer("lipschitz_const", torch.Tensor([lipschitz_const]))
         # Directly enforce Lipschitz constraint
         self = direct_norm(self, max_norm=lipschitz_const, kind=kind)
-
-    def forward(self, x):
-        return torch.nn.functional.linear(x, self.weight, self.bias)
 
 
 class MonotonicLayer(LipschitzLinear):
@@ -107,54 +101,48 @@ class MonotonicLayer(LipschitzLinear):
             with respect to the i-th input.
             Default: ``None``
         kind (str, optional): Type of Lipschitz constraint to enforce. Default: ``"one-inf"``
+            Will be passed to :func:`direct_norm`, see its documentation for details.
     """
 
     def __init__(
         self,
-        in_features,
-        out_features,
-        bias=True,
-        lipschitz_const=1,
+        in_features: int,
+        out_features: int,
+        bias: bool = True,
+        lipschitz_const: float = 1.0,
         monotonic_constraints: T.Optional[T.Iterable] = None,
-        kind="one-inf",
+        kind: str = "one-inf",
     ):
-        super().__init__(
-            in_features, out_features, bias, lipschitz_const, kind
-        )
-        self.register_buffer(
-            "lipschitz_const", torch.tensor([lipschitz_const])
-        )
+        super().__init__(in_features, out_features, bias, lipschitz_const, kind)
+        self.register_buffer("lipschitz_const", torch.tensor([lipschitz_const]))
         if monotonic_constraints is None:
             monotonic_constraints = torch.ones(in_features)
         else:
-            monotonic_constraints = torch.Tensor(
-                monotonic_constraints)
-        if monotonic_constraints.ndim == 1:
-            monotonic_constraints = monotonic_constraints.unsqueeze(-1)
-        if monotonic_constraints.shape[0] != in_features:
-            raise ValueError(
-                f"monotonic_constraints must be of length {in_features},"
-                f" got {monotonic_constraints.shape[0]}"
-            )
-        if (
-            monotonic_constraints.shape[1] != out_features
-            and monotonic_constraints.shape[1] != 1
-        ):
+            monotonic_constraints = torch.Tensor(monotonic_constraints)
+
+        if monotonic_constraints.shape not in [
+            (in_features, out_features),
+            (in_features, 1),
+            (in_features,),
+        ]:
             raise ValueError(
                 "monotonic_constraints must be of shape (in_features, out_features),"
+                " ,(in_features, 1), or (in_features,)"
                 f" got {monotonic_constraints.shape}"
             )
 
+        if monotonic_constraints.ndim == 1:
+            monotonic_constraints = monotonic_constraints.unsqueeze(-1)
         self.register_buffer("monotonic_constraints", monotonic_constraints)
 
     def forward(self, x: torch.Tensor):
         residual = self.lipschitz_const * x @ self.monotonic_constraints
-        x = torch.nn.functional.linear(x, self.weight, self.bias)
+        x = super()(x)
         return (x + residual) / 2
 
 
 class RMSNorm(Module):
-    def __init__(self, norm_shape, affine=True):
+    def __init__(self, norm_shape: T.Union[T.Iterable, int], affine: bool = True):
         super().__init__()
         self.register_buffer("norm_shape", torch.tensor(norm_shape))
         weights = torch.ones(norm_shape) / self.norm_shape.sqrt()  # type: ignore
@@ -164,8 +152,7 @@ class RMSNorm(Module):
 
     def forward(self, x):
         rms = torch.sqrt(torch.mean(x**2, dim=-1, keepdim=True)).clip(min=1)
-        weight = self.weight.pow(2)  # type: ignore
-        return (x / rms) * weight + self.bias
+        return (x / rms) * self.weight.pow(2) + self.bias
 
 
 class SigmaNet(MonotonicWrapper):

@@ -65,9 +65,6 @@ max_norm = 3 ** (1 / 8)
 # --------------- Build Lipschitz Network ---------------
 model = torch.nn.Sequential(
     direct_norm(torch.nn.Linear(2, 1024), kind="two-inf", max_norm=max_norm),
-    torch.nn.BatchNorm1d(1024, affine=False),
-    GroupSort(16),
-    direct_norm(torch.nn.Linear(1024, 1024), kind="inf", max_norm=max_norm),
     GroupSort(16),
     direct_norm(torch.nn.Linear(1024, 256), kind="inf", max_norm=max_norm),
     GroupSort(16),

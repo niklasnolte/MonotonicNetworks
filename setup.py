@@ -7,7 +7,7 @@ setup(
     url="",
     license="MIT",
     author="Ouail Kitouni, Niklas Nolte",
-    author_email="kitouni@mit.edu, nnolte@mit.edu",
+    author_email="kitouni@mit.edu, nolte@meta.com",
     description=(
         "Pytorch implementation of constrained weight operator norms for robustness "
         + "and monotonicity in neural networks."
