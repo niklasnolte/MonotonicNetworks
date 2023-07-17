@@ -15,7 +15,7 @@ def direct_norm(
     layer: nn.Linear,
     kind: str = "one",
     always_norm: bool = False,
-    max_norm: float = None,
+    max_norm: t.Optional[float] = None,
     parameter_name: str = "weight",
     vectorwise: bool = True,
 ) -> nn.Linear:

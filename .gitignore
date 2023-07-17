@@ -1,3 +1,5 @@
+# torch
+*.pt
 # IDE
 .idea
 
@@ -53,6 +55,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+
 
 # Translations
 *.mo
