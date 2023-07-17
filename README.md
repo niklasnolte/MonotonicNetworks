@@ -21,21 +21,21 @@ The code here allows one to apply various weight constraints on `torch.nn.Linear
 
 
 # Installation
-<div align="center">
+## Latest version
+`pip install monotonicnetworks`
 
-| <center> **pip** | <center> **conda**|
-|---|---|
-|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c conda-forge monotonicnetworks (coming soon)`<br> <center>![Conda](https://img.shields.io/conda/dn/conda-forge/monotonicnetworks)
-</center> |
+[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)
 
-</div>
+or
 
+ `conda install -c conda-forge monotonicnetworks` (coming soon)
+ 
+![Conda](https://img.shields.io/conda/dn/conda-forge/monotonicnetworks)
 
-</div>
-
+## Previous version
 Note that the package used to be called `monotonenorm` and was renamed to `monotonicnetworks` on 2023-07-15. The old package is still available on PyPI and conda-forge, but will not be updated.
 
- [![PyPI version](https://badge.fury.io/py/monotonenorm.svg)](https://badge.fury.io/py/monotonenorm) (deprecated) `pip install monotonenorm`
+[![PyPI version](https://badge.fury.io/py/monotonenorm.svg)](https://badge.fury.io/py/monotonenorm) (deprecated) `pip install monotonenorm`
 
 [![Latest conda-forge version](https://img.shields.io/conda/v/okitouni/monotonenorm)](https://anaconda.org/okitouni/monotonenorm) (deprecated) `conda install -c okitouni monotonenorm` 
 
@@ -87,16 +87,16 @@ In this toy model, we will assume that we have good reason to believe that the f
 
 Training a monotonic NN and an unconstrained NN on the purple points and evaluating the networks on a uniform grid gives the following result:
 
-![Monotonic Dependence](Examples/figures/monotonic_dependence_unobserved_UpFalse_InterpFalse.png)
+![Monotonic Dependence](https://user-images.githubusercontent.com/28654657/253890551-db570a42-3483-4a02-93e9-e32c8d02eb18.png)
 
 ## Robustness
 Now we will make a different toy model with one noisy data point. This will show that the Lipschitz continuous network is more robust against outliers than an unconstrained network because its gradient with respect to the input is bounded between -1 and 1. Additionally, it is more robust against adversarial attacks/data corruption for the same reason.
 
-![Robust Against Outliers](Examples/figures/robust_against_noisy_outlier.png)
+![Robust Against Outliers](https://user-images.githubusercontent.com/28654657/253890554-81dfbcc5-9ed7-4494-94fd-a692bb087c4f.png)
 
 ## Lipschitz NNs can describe arbitrarily complex boundaries
 GroupSort weight-constrained Neural Networks are universal approximators of Lipschitz continuous functions. Furthermore, they can describe arbitrarily complex decision boundaries in classification problems provided the proper objective function is used in training. In `Examples\flower.py` we provide code to regress on an example "complex" decision boundary in 2D. 
 
 Here are the contour lines of the resulting network (along with the training points in black).
 
-![Flower](Examples/figures/flower.png)
+![Flower](https://user-images.githubusercontent.com/28654657/253890555-25604500-3720-4962-925b-b97aee8ee42c.png)
