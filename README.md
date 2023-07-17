@@ -25,7 +25,7 @@ The code here allows one to apply various weight constraints on torch.nn.Linear 
 
 | <center> **pip** | <center> **conda**|
 |---|---|
-|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c conda-forge monotonicnetworks`<br> <center>![Conda](https://img.shields.io/conda/dn/conda-forge/monotonicnetworks)
+|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c conda-forge monotonicnetworks (coming soon)`<br> <center>![Conda](https://img.shields.io/conda/dn/conda-forge/monotonicnetworks)
 </center> |
 
 </div>
