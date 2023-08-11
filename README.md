@@ -25,11 +25,8 @@ The code here allows one to apply various weight constraints on `torch.nn.Linear
 
 | <center> **pip** | <center> **conda**|
 |---|---|
-|`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center>| `conda install -c conda-forge monotonicnetworks (coming soon)`<br> <center>![Conda](https://img.shields.io/conda/dn/conda-forge/monotonicnetworks)
-</center> |
-
-</div>
-
+`pip install monotonicnetworks`<br> <center>[![PyPI version](https://badge.fury.io/py/monotonicnetworks.svg)](https://badge.fury.io/py/monotonicnetworks)</center> | `conda install -c conda-forge monotonicnetworks`<br> <center>![Conda](https://img.shields.io/conda/dn/conda-forge/monotonicnetworks)
+</center> 
 
 </div>
 
@@ -57,9 +54,9 @@ linear_native = lmn.LipschitzLinear(10, 10, kind="one-inf") # |W|_1,inf constrai
 
  The function `lmn.direct_norm` can apply various weight constraints on torch.nn.Linear layers through the `kind` keyword and return a Lipschitz-constrained linear layer. Alternatively, the code in `montonenorm/LipschitzMonotonicNetwork.py` contains several classes that can be used to create Lipschitz and Monotonic Layers directly.
 
-The `LipschitzLinear` class is a linear layer with a Lipschitz constraint on its weights.
+- The `LipschitzLinear` class is a linear layer with a Lipschitz constraint on its weights.
 
-The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer where the first output is monotonically increasing in the first input ([1, 0]), the second output is monotonically decreasing in the second input ([0, -1]), and the third output is monotonically increasing in the first input and monotonically decreasing in the second input ([1, -1]). We can do this by specifying the monotonicity constraints as follows:
+- The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer where the first output is monotonically increasing in the first input ([1, 0]), the second output is monotonically decreasing in the second input ([0, -1]), and the third output is monotonically increasing in the first input and monotonically decreasing in the second input ([1, -1]). We can do this by specifying the monotonicity constraints as follows:
 ```python
 import monotonicnetworks as lmn
 
@@ -68,11 +65,24 @@ linear = lmn.MonotonicLayer(2, 3, monotonic_constraints=[[1, 0], [0, 1], [1, -1]
 Using a 1D tensor for the constraint assumes that they are the same for each output dimension. By default, the code assumes all outputs are monotonically increasing with all inputs.
 
 
-The `MonotonicWrapper` class is a wrapper around a module with a Lipschitz constant. It adds a term to the output of the module which enforces monotonicity constraints given by monotonic_constraints. The class returns a module that is monotonic and Lipschitz with constant lipschitz_const.
+- The `MonotonicWrapper` class is a wrapper around a module with a Lipschitz constant. It adds a term to the output of the module which enforces monotonicity constraints given by monotonic_constraints. The class returns a module that is monotonic and Lipschitz with constant lipschitz_const. This is the preferred way to create a monotonic network. Example:
+```python
+from torch import nn
+import monotonicnetworks as lmn
 
-The `SigmaNet` class is a deprecated class that is equivalent to the MonotonicWrapper class.
+lip_nn = nn.Sequential(
+    lmn.LipschitzLinear(2, 32, kind="one-inf"),
+    lmn.GroupSort(2),
+    lmn.LipschitzLinear(32, 2, kind="inf"),
+)
+monotonic_nn = lmn.MonotonicWrapper(lip_nn, monotonic_constraints=[1,0]) # first input increasing, no monotonicity constraints on second input
+```
+Note that one can stack monotonic modules.
 
-The `RMSNorm` class is a class that implements the RMSNorm normalization layer. It can help when training 
+
+- The `SigmaNet` class is a deprecated class that is equivalent to the MonotonicWrapper class.
+
+- The `RMSNorm` class is a class that implements the RMSNorm normalization layer. It can help when training 
 a model with many Lipschitz-constrained layers.
 
 
