@@ -75,7 +75,7 @@ lip_nn = nn.Sequential(
     lmn.GroupSort(2),
     lmn.LipschitzLinear(32, 2, kind="inf"),
 )
-monotonic_nn = lmn.MonotonicWrapper(lip_nn)
+monotonic_nn = lmn.MonotonicWrapper(lip_nn, monotonic_constraints=[1,0]) # first input increasing, no monotonicity constraints on second input
 ```
 Note that one can stack monotonic modules.
 
