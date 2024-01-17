@@ -97,16 +97,16 @@ In this toy model, we will assume that we have good reason to believe that the f
 
 Training a monotonic NN and an unconstrained NN on the purple points and evaluating the networks on a uniform grid gives the following result:
 
-![Monotonic Dependence](Examples/figures/monotonic_dependence_unobserved_UpFalse_InterpFalse.png)
+![Monotonic Dependence](https://github.com/niklasnolte/MonotonicNetworks/blob/main/Examples/figures/monotonic_dependence_unobserved_UpFalse_InterpFalse.png?raw=true)
 
 ## Robustness
 Now we will make a different toy model with one noisy data point. This will show that the Lipschitz continuous network is more robust against outliers than an unconstrained network because its gradient with respect to the input is bounded between -1 and 1. Additionally, it is more robust against adversarial attacks/data corruption for the same reason.
 
-![Robust Against Outliers](Examples/figures/robust_against_noisy_outlier.png)
+![Robust Against Outliers](https://github.com/niklasnolte/MonotonicNetworks/blob/main/Examples/figures/robust_against_noisy_outlier.png?raw=true)
 
 ## Lipschitz NNs can describe arbitrarily complex boundaries
 GroupSort weight-constrained Neural Networks are universal approximators of Lipschitz continuous functions. Furthermore, they can describe arbitrarily complex decision boundaries in classification problems provided the proper objective function is used in training. In `Examples\flower.py` we provide code to regress on an example "complex" decision boundary in 2D. 
 
 Here are the contour lines of the resulting network (along with the training points in black).
 
-![Flower](Examples/figures/flower.png)
+![Flower](https://github.com/niklasnolte/MonotonicNetworks/blob/main/Examples/figures/flower.png?raw=true)
