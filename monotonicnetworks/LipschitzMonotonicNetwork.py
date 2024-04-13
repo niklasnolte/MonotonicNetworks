@@ -78,7 +78,7 @@ class LipschitzLinear(Linear):
         out_features: int,
         bias: bool = True,
         lipschitz_const: float = 1.0,
-        kind: str = "one-inf",
+        kind: str = "one",
     ):
         super().__init__(in_features, out_features, bias=bias)
         self.register_buffer(
@@ -125,7 +125,7 @@ class MonotonicLayer(LipschitzLinear):
         bias: bool = True,
         lipschitz_const: float = 1.0,
         monotonic_constraints: T.Optional[T.Iterable] = None,
-        kind: str = "one-inf",
+        kind: str = "one",
     ):
         super().__init__(
             in_features, out_features, bias, lipschitz_const, kind
