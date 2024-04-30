@@ -109,7 +109,7 @@ class MonotonicLayer(LipschitzLinear):
             If a 2D tensor, the (i, j)-th element specifies the constraint on the j-th output
             with respect to the i-th input.
             Default: ``None``
-        kind (str, optional): Type of Lipschitz constraint to enforce. Default: ``"one-inf"``
+        kind (str, optional): Type of Lipschitz constraint to enforce. Default: ``"one"``
             Options are
             - "one",  # |W|_1 constraint
             - "inf",  # |W|_inf constraint
