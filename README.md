@@ -56,11 +56,11 @@ linear_native = lmn.LipschitzLinear(10, 10, kind="one-inf") # |W|_1,inf constrai
 
 - The `LipschitzLinear` class is a linear layer with a Lipschitz constraint on its weights.
 
-- The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer where the first output is monotonically increasing in the first input ([1, 0]), the second output is monotonically decreasing in the second input ([0, -1]), and the third output is monotonically increasing in the first input and monotonically decreasing in the second input ([1, -1]). We can do this by specifying the monotonicity constraints as follows:
+- The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer where the first output is monotonically increasing in the first input ([[1, ., .], [0, ., .]]), the second output is monotonically decreasing in the second input ([[., 0, .], [., -1, .]]), and the third output is monotonically increasing in the first input and monotonically decreasing in the second input ([[., ., 1], [., ., -1]]). We can do this by specifying the monotonicity constraints as follows:
 ```python
 import monotonicnetworks as lmn
 
-linear = lmn.MonotonicLayer(2, 3, monotonic_constraints=[[1, 0], [0, 1], [1, -1]])
+linear = lmn.MonotonicLayer(2, 3, monotonic_constraints=[[1, 0, 1], [0, -1, -1]])
 ```
 Using a 1D tensor for the constraint assumes that they are the same for each output dimension. By default, the code assumes all outputs are monotonically increasing with all inputs.
 
