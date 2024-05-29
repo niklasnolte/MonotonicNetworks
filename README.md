@@ -19,6 +19,11 @@ The code here allows one to apply various weight constraints on `torch.nn.Linear
 "two-inf",  # |W|_2,inf constraint
 ~~~
 
+## ‼️‼️Important‼️‼️
+Check that you have the right `kind` of lipschitz constraint.  
+If you are not sure: `kind="one-inf"` in the first layer, `kind="inf"` in all following layers.  
+The default (`kind="one"`) works well ONLY when the output is scalar!
+
 
 # Installation
 <div align="center">
@@ -43,6 +48,8 @@ Make sure you have the following packages installed:
 - tqdm (optional, to run the examples with a progress bar)
 
 # Usage
+
+
 Here's an example showing two ways to create a Lipschitz-constrained linear layer.
 ```python
 from torch import nn
@@ -56,13 +63,13 @@ linear_native = lmn.LipschitzLinear(10, 10, kind="one-inf") # |W|_1,inf constrai
 
 - The `LipschitzLinear` class is a linear layer with a Lipschitz constraint on its weights.
 
-- The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer. We specify the monotonic constraints wrt. the first input: [1,0,-1]. Thus, the first output is monotonically increasing (1), the second has no constraint (0) and the third is monotonically decreasing (-1) wrt. the first input. For the second input: [0,1,0] only the second output has a monotonically increasing constraint. The code for this looks as follows:
+- The `MonotonicLayer` class is a linear layer with a Lipschitz constraint on its weights and monotonicity constraints that can be specified for each input dimension, or for each input-output pair. For instance, suppose we want to model a 2 input x 3 output linear layer. We specify the monotonic constraints wrt. the first input: `[1,0,-1]`. Thus, the first output is monotonically increasing (1), the second has no constraint (0) and the third is monotonically decreasing (-1) wrt. the first input. For the second input: `[0,1,0]` only the second output has a monotonically increasing constraint. The code for this looks as follows:
 ```python
 import monotonicnetworks as lmn
 
 linear = lmn.MonotonicLayer(2, 3, monotonic_constraints=[[1, 0, -1], [0, 1, 0]])
 ```
-The accepted 2D tensor shape for monotonic constraints is [input_dim, output_dim]
+The accepted 2D tensor shape for monotonic constraints is [input_dim, output_dim].  
 Using a 1D tensor for the constraint assumes that they are the same for each output dimension. By default, the code assumes all outputs are monotonically increasing with all inputs.
 
 
